@@ -47,6 +47,7 @@ const config = {
     dialog: './src/dialog.js',
     'seamless-scroll': './src/seamless-scroll.js',
     'demo': './src/demo.js',
+    'home-pod': './src/home-pod.js',
   },
   output: {
     filename: '[name].bundle.js',
@@ -118,6 +119,11 @@ const config = {
       template: './public/demo.ejs',
       filename: 'demo.html',
       chunks: ['demo'],
+    }),
+     new HtmlWebpackPlugin({
+      template: './public/home-pod.ejs',
+      filename: 'home-pod.html',
+      chunks: ['home-pod'],
     }),
     new HtmlWebpackPlugin({
       templateParameters: {

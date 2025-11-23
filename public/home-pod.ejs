@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HomePod mini pattern with css-doodle</title>
+    <style>
+    html {
+        margin: 0;
+        height: 100%;
+        display: grid;
+        place-content: center;
+        background-color: #8c8d91;
+        background-image: radial-gradient(circle, transparent, white 50%);
+    }
+    </style>
+</head>
+
+<body>
+    <css-doodle>
+        <style>
+        @size: 300px;
+        --circle-size: 150px;
+        --circle-color: #f2f0fccc;
+
+        background: @m75(radial-gradient(#0000 49%, @var(--circle-color) 49%, @var(--circle-color) 50%, #0000 0) @plot(r: 1) / @var(--circle-size) @var(--circle-size) no-repeat);
+        </style>
+    </css-doodle>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/css-doodle/0.37.3/css-doodle.min.js'></script>
+</body>
+
+</html>
