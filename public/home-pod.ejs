@@ -1,33 +1,93 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>HomePod mini pattern with css-doodle</title>
+    <title>Canvas HomePod Texture (Corrected)</title>
     <style>
-    html {
-        margin: 0;
-        height: 100%;
-        display: grid;
-        place-content: center;
-        background-color: #8c8d91;
-        background-image: radial-gradient(circle, transparent, white 50%);
-    }
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #8c8d91;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            position: absolute;
+        }
     </style>
 </head>
-
 <body>
-    <css-doodle>
-        <style>
-        @size: 300px;
-        --circle-size: 150px;
-        --circle-color: #f2f0fccc;
+    <canvas id="texture-canvas"></canvas>
 
-        background: @m75(radial-gradient(#0000 49%, @var(--circle-color) 49%, @var(--circle-color) 50%, #0000 0) @plot(r: 1) / @var(--circle-size) @var(--circle-size) no-repeat);
-        </style>
-    </css-doodle>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/css-doodle/0.37.3/css-doodle.min.js'></script>
+    <script>
+        const canvas = document.getElementById('texture-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- 参数配置 (对应您的 CSS-Doodle) ---
+        const CONFIG = {
+            count: 75,             // @m75: 圆环数量
+            circleColor: '#f2f0fccc', // --circle-color: 圆环颜色
+            lineWidth: 1.5,        // 模拟 gradient 边缘的厚度
+            scale: 0.4             // 整体缩放比例，用于适配屏幕
+        };
+
+        function draw() {
+            // 1. 设置画布尺寸
+            const W = window.innerWidth;
+            const H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+
+            // 2. 确定尺寸逻辑
+            // 在 doodle 中，容器是 300px，圆是 150px。
+            // 也就是说：绘制的圆环直径是容器直径的一半 (0.5)。
+            // 绘制的位置 @plot(r:1) 是在容器边缘。
+            
+            // 为了在全屏 Canvas 上复刻，我们定义一个基准尺寸
+            // 取屏幕较短边的一半作为基准半径 "R"
+            const baseSize = Math.min(W, H) * CONFIG.scale; 
+            const orbitRadius = baseSize / 2; // 轨道半径 (圆心分布的位置)
+            const ringRadius = orbitRadius * 0.5; // 圆环半径 (doodle中是容器的一半)
+
+            const centerX = W / 2;
+            const centerY = H / 2;
+
+            // 3. 绘制背景 (模拟 radial-gradient 背景)
+            const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, orbitRadius);
+            bgGradient.addColorStop(0, 'transparent');
+            bgGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)'); // 模拟 white 50%
+            bgGradient.addColorStop(1, 'transparent');
+            // ctx.fillStyle = bgGradient; // 暂时注释，如果需要背景光晕可开启
+            // ctx.fillRect(0, 0, W, H);
+
+            // 4. 绘制干涉纹理
+            ctx.strokeStyle = CONFIG.circleColor;
+            ctx.lineWidth = CONFIG.lineWidth;
+            
+            // 关键逻辑：循环 N 次，沿圆周分布圆环
+            for (let i = 0; i < CONFIG.count; i++) {
+                // 计算当前圆环的圆心位置
+                // 角度从 0 到 2PI 均匀分布
+                const angle = (i / CONFIG.count) * (Math.PI * 2);
+
+                // 极坐标转换：计算圆心 (x, y)
+                // 对应 @plot(r: 1) -> 这里的 r 就是 orbitRadius
+                const x = centerX + Math.cos(angle) * orbitRadius;
+                const y = centerY + Math.sin(angle) * orbitRadius;
+
+                // 绘制圆环
+                ctx.beginPath();
+                ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // 初始化并监听窗口调整
+        draw();
+        window.addEventListener('resize', draw);
+
+    </script>
 </body>
-
 </html>
