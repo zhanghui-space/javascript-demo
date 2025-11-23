@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>index</title>
+  </head>
+
+  <body>
+    <div class="container" id="container">
+      <div class="aside">
+        <div>
+          <ul id="menu">
+            <% for (const page of getPages()) { %>
+            <li data-link="<%= page.path %>" data-key="<%= page.key %>" data-title="<%= page.title %>">
+              <span class="icon"></span><a href="#<%= page.key %>" data-link="<%= page.path %>" data-key="<%= page.key %>"><%= page.title %></a>
+            </li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="main">
+        <iframe class="vh-100 w-100" id="iframe"></iframe>
+      </div>
+    </div>
+  </body>
+</html>

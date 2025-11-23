@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>无缝滚动</title>
+    <style>
+      .container {
+        height: 400px;
+        width: 200px;
+        margin: 100px auto;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        box-sizing: border-box;
+        color: #212529;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .item {
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        background-color: #fff;
+        box-sizing: border-box;
+      }
+      .item.clone-item {
+        color: #084298;
+        background-color: #cfe2ff;
+      }
+      .item span {
+        display: inline-block;
+        vertical-align: middle;
+        width: 24px;
+        height: 24px;
+        color: #0d6efd;
+        line-height: 24px;
+        border: 1px solid #0d6efd;
+        cursor: pointer;
+        margin-left: 12px;
+        border-radius: 3px;
+        transition: all 0.15s;
+      }
+      .item span:hover {
+        background: #0d6efd;
+        color: #fff;
+      }
+
+      .floating {
+        color: #664d03;
+        background-color: #fff3cd;
+        min-width: 200px;
+        min-height: 140px;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        width: max-content;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        display: none;
+      }
+
+      .floating .arrow {
+        position: absolute;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        background-color: #fff3cd;
+        left: -6px;
+        transform: rotate(45deg);
+        z-index: 1;
+        border-left: 1px solid rgba(0, 0, 0, 0.125);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      }
+      .floating::after {
+        content: ' ';
+        display: inline-block;
+        width: 20px;
+        height: 100%;
+        position: absolute;
+        background-color: #fff3cd;
+        z-index: 2;
+      }
+      .close {
+        display: inline-block;
+        width: 16px;
+        position: absolute;
+        top: 10px;
+        right: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" id="container">
+      <div id="content"></div>
+    </div>
+    <div id="floating" class="floating">
+      <div id="arrow" class="arrow"></div>
+      <span class="close" id="close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+          <path
+            d="M345 137l17-17L328 86.1l-17 17-119 119L73 103l-17-17L22.1 120l17 17 119 119L39 375l-17 17L56 425.9l17-17 119-119L311 409l17 17L361.9 392l-17-17-119-119L345 137z"
+          />
+        </svg>
+      </span>
+    </div>
+    <script>
+      const emojis = [
+        '😀 😁 😂 🤣 😃',
+        '😄 😅 😆 😉 😊',
+        '😫 😴 😌 😛 😜',
+        '👆🏻 😒 😓 😔 👇🏻',
+        '😑 😶 🙄 😏 😣',
+        '😞 😟 😤 😢 😭',
+        '🤑 😲 🙄 🙁 😖',
+        '👍 👎 👊 ✊ 🤛',
+        '🙄 ✋ 🤚 🖐 🖖',
+        '👍🏼 👎🏼 👊🏼 ✊🏼 🤛🏼',
+        '☝🏽 ✋🏽 🤚🏽 🖐🏽 🖖🏽',
+        '🌖 🌗 🌘 🌑 🌒',
+        '💫 💥 💢 💦 💧',
+        '🐠 🐟 🐬 🐳 🐋',
+        '😬 😐 😕 😯 😶',
+        '😇 😏 😑 😓 😵',
+        '🐥 🐣 🐔 🐛 🐤',
+        '💪 ✨ 🔔 ✊ ✋',
+        '👇 👊 👍 👈 👆',
+        '💛 👐 👎 👌 💘',
+        '👍🏼 👎🏼 👊🏼 ✊🏼 🤛🏼',
+        '☝🏽 ✋🏽 🤚🏽 🖐🏽 🖖🏽',
+        '🌖 🌗 🌘 🌑 🌒',
+        '💫 💥 💢 💦 💧',
+        '🐠 🐟 🐬 🐳 🐋',
+        '😬 😐 😕 😯 😶',
+        '😇 😏 😑 😓 😵',
+        '🐥 🐣 🐔 🐛 🐤',
+        '💪 ✨ 🔔 ✊ ✋',
+        '👇 👊 👍 👈 👆',
+        '💛 👐 👎 👌 💘',
+      ];
+      function render() {
+        const fragment = document.createDocumentFragment();
+        for (let index = 0; index < emojis.length; index++) {
+          const emoji = emojis[index];
+          const item = document.createElement('div');
+          const span = document.createElement('span');
+          item.textContent = emoji;
+          item.classList.add('item');
+          item.appendChild(span);
+          span.textContent = index;
+          span.setAttribute('data-index', index);
+          fragment.appendChild(item);
+        }
+        content.appendChild(fragment);
+      }
+
+      render();
+    </script>
+  </body>
+</html>

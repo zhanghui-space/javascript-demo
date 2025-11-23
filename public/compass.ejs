@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>仪表盘</title>
+    <style>
+      .svgfont:focus {
+        outline: none;
+      }
+      .uranus-icon {
+        vertical-align: middle;
+        text-align: center;
+        display: inline-flex;
+        position: relative;
+      }
+      .uranus-icon:focus {
+        outline: none;
+      }
+      * {
+        font-family:
+          Open Sans,
+          PingFang SC,
+          Microsoft YaHei,
+          Helvetica Neue,
+          Hiragino Sans GB,
+          WenQuanYi Micro Hei,
+          Arial,
+          sans-serif;
+      }
+      :root {
+        --vh: 1vh;
+      }
+      .home-distance-wrapper {
+        color: #fff;
+        z-index: 1;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 14px;
+        line-height: 14px;
+        display: flex;
+      }
+      .home-distance-wrapper .home-distance-text {
+        margin-left: 4px;
+        padding: 1px 0;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 20px;
+      }
+      .gimbal-icon {
+        display: block;
+      }
+      .gimbal-icon:before {
+        content: '';
+        border-bottom: calc(0.5em + 1px) solid transparent;
+        border-left: 0.5em solid transparent;
+        border-right: 0.5em solid transparent;
+        width: 0;
+        height: 0;
+        display: block;
+        position: absolute;
+        bottom: 100%;
+      }
+      .gimbal-icon .gimbal-icon-inner {
+        background-color: #1fa3f6;
+        width: 1em;
+        height: 1em;
+        margin: 0.5px 1px 1px;
+        display: block;
+        position: relative;
+      }
+      .gimbal-icon .gimbal-icon-inner:before {
+        content: '';
+        border-bottom: 0.5em solid #1fa3f6;
+        border-left: 0.5em solid transparent;
+        border-right: 0.5em solid transparent;
+        width: 0;
+        height: 0;
+        display: block;
+        position: absolute;
+        bottom: 100%;
+      }
+      .pitch-bar-wrapper {
+        padding-left: 7px;
+        padding-right: 5px;
+      }
+      .pitch-bar-wrapper .pitch-bar-text {
+        text-align: center;
+        color: #00ee8b;
+        width: 80px;
+        margin-left: -34px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        position: absolute;
+        top: -25px;
+      }
+      .pitch-bar {
+        color: rgba(255, 255, 255, 0.2);
+        width: 7px;
+        height: 73px;
+        box-shadow: 0 0 0 0.4px rgba(0, 0, 0, 0.6);
+      }
+      .marker {
+        background-color: #fff;
+        width: 7px;
+        height: 2px;
+        position: absolute;
+        transform: translateY(-50%);
+        box-shadow: 0 0 0 0.4px rgba(0, 0, 0, 0.6);
+      }
+      .marker.zero-marker {
+        width: auto;
+        top: 50%;
+        left: 7px;
+        right: 0;
+      }
+      .gimbal-icon {
+        position: absolute;
+        left: -6px;
+        transform: rotate(90deg) translate(-50%);
+      }
+      .hsi-middle-wrapper {
+        justify-content: center;
+        align-items: center;
+        width: 380px;
+        height: 100%;
+        padding-left: 42px;
+        display: flex;
+        position: relative;
+      }
+      .hsi-middle-wrapper .pitch-bar-wrapper {
+        position: absolute;
+        top: 66px;
+        left: 96px;
+      }
+      .hsi-middle-wrapper .home-distance-wrapper {
+        position: absolute;
+        bottom: 0;
+        left: 250px;
+      }
+      .hsi-middle-wrapper .hsi {
+        width: 180px;
+        height: 180px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hsi-middle-wrapper .hsi .hsi-compass {
+        z-index: 1;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .hsi-middle-wrapper .hsi .hsi-direction-angle {
+        text-align: center;
+        color: #00ee8b;
+        z-index: 2;
+        width: 146px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        position: absolute;
+      }
+      .hsi-middle-wrapper .hsi .horizontal-obstacle-avoidance {
+        z-index: 2;
+        position: absolute;
+        top: 55px;
+        left: 23px;
+      }
+      .hsi-middle-wrapper .hsi .vertical-obstacle-avoidance {
+        z-index: 2;
+        position: absolute;
+        top: 66px;
+        left: 152px;
+      }
+      .hsi-middle-wrapper .hsi .vertical-velocity-vector {
+        z-index: 2;
+        position: absolute;
+        top: 78px;
+        left: 165px;
+      }
+      @supports ((-webkit-appearance: none)) and (not (overflow: -webkit-marquee)) and (not (-ms-ime-align: auto)) and (not ((-moz-appearance: none))) {
+      }
+      @supports ((-webkit-appearance: none)) and (not (overflow: -webkit-marquee)) and (not (-ms-ime-align: auto)) and (not ((-moz-appearance: none))) {
+      }
+      .router-cockpit #project-app > :not(:is(.map-elements-container, .preview-photo-service, .map-pop-wrapper)) {
+        display: none;
+      }
+    </style>
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script>
+  
+    </script>
+  </head>
+  <body class="container">
+    <div class="my-4">
+      <button type="button" class="btn btn-primary me-md-2" id="plus"><i class="bi bi-plus-lg"></i></button>
+      <button type="button" class="btn btn-primary" id="minus"><i class="bi bi-dash-lg"></i></button>
+    </div>
+    <div class="hsi-middle-wrapper py-2" style="background-color: #232323">
+      <div class="pitch-bar-wrapper">
+        <div class="pitch-bar-text">--°</div>
+        <div class="pitch-bar" style="background: currentcolor"></div>
+        <div class="marker" style="top: 37.5%"></div>
+        <div class="marker zero-marker"></div>
+        <div class="marker" style="top: 68.75%"></div>
+        <div class="marker" style="top: 87.5%"></div>
+        <span class="gimbal-icon" style="font-size: 10px; top: 50%"><span class="gimbal-icon-inner" style="font-size: 8px"></span></span>
+      </div>
+      <div class="altitude-wrapper"></div>
+      <div class="speed-wrapper"></div>
+      <div class="home-distance-wrapper">
+        <span>
+          <span
+            class="uranus-icon cursor-default content-disabled icon-opacity cursor-default content-disabled icon-opacity cursor-default content-disabled icon-opacity"
+          >
+            <svg class="svgfont svgfont-home_distance" style="fill: rgb(255, 204, 0); width: 16px; height: 16px">
+              <use xlink:href="#home_distance"></use>
+            </svg>
+          </span>
+          <span class="home-distance-text cursor-default">--</span>
+        </span>
+      </div>
+
+      <div class="hsi">
+        <div class="hsi-direction-angle">--°</div>
+        <svg height="179" width="146" class="hsi-compass">
+          <g><rect x="71.5" y="22" width="3" height="10" fill="#00EE8B" stroke-width="0.2" stroke="#000000"></rect></g>
+          <g transform="rotate(-10,73,105)" id="rotate">
+            <image x="0" y="32" xlink:href="https://fh.dji.com/assets/svg/hsi-compass-outlined.1f486001.svg" height="146" width="146"></image>
+            <image
+              xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTRweCIgaGVpZ2h0PSIxNHB4IiB2aWV3Qm94PSIwIDAgMTQgMTQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZGVmcz4KICAgICAgICA8cGF0aCBkPSJNNi4wOTM3NSwwIEM5LjQ1OTIzNTE5LDAgMTIuMTg3NSwyLjcyODI2NDgxIDEyLjE4NzUsNi4wOTM3NSBDMTIuMTg3NSw5LjQ1OTIzNTE5IDkuNDU5MjM1MTksMTIuMTg3NSA2LjA5Mzc1LDEyLjE4NzUgQzIuNzI4MjY0ODEsMTIuMTg3NSAwLDkuNDU5MjM1MTkgMCw2LjA5Mzc1IEMwLDIuNzI4MjY0ODEgMi43MjgyNjQ4MSwwIDYuMDkzNzUsMCBaIE02LjA5Mzc1LDEuMzEyNSBDMy40NTMxMzg1NCwxLjMxMjUgMS4zMTI1LDMuNDUzMTM4NTQgMS4zMTI1LDYuMDkzNzUgQzEuMzEyNSw4LjczNDM2MTQ2IDMuNDUzMTM4NTQsMTAuODc1IDYuMDkzNzUsMTAuODc1IEM4LjczNDM2MTQ2LDEwLjg3NSAxMC44NzUsOC43MzQzNjE0NiAxMC44NzUsNi4wOTM3NSBDMTAuODc1LDMuNDUzMTM4NTQgOC43MzQzNjE0NiwxLjMxMjUgNi4wOTM3NSwxLjMxMjUgWiBNNS4xMzE4NzUsMi44ODc1IEw1LjEzMTg3NSw1LjMyODc1IEw3LjE3OTM3NSw1LjMyODc1IEw3LjE3OTM3NSwyLjg4NzUgTDguNjM2MjUsMi44ODc1IEw4LjYzNjI1LDkuMDMgTDcuMTc5Mzc1LDkuMDMgTDcuMTc5Mzc1LDYuNDcwNjI1IEw1LjEzMTg3NSw2LjQ3MDYyNSBMNS4xMzE4NzUsOS4wMyBMMy42NzUsOS4wMyBMMy42NzUsMi44ODc1IEw1LjEzMTg3NSwyLjg4NzUgWiIgaWQ9InBhdGgtdWd2amFxMzZ4Ny0xIj48L3BhdGg+CiAgICA8L2RlZnM+CiAgICA8ZyBpZD0i6aG16Z2iLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLnlLvmnb8iIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05MjEzLjAwMDAwMCwgLTQ2NDAuMDAwMDAwKSI+CiAgICAgICAgICAgIDxnIGlkPSLnvJbnu4QtM+Wkh+S7vS0zNyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzgyNy4wMDAwMDAsIDQzNzkuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8ZyBpZD0i57yW57uELTIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAxLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSLnvJbnu4QtNTHlpIfku70tNjIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwNzguMDAwMDAwLCAyMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Iue8lue7hC01NSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDIwMi4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSLnvJbnu4QtNDgiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLjAwMDAwMCwgNy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZyBpZD0i57yW57uELTMyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgMjYuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSIy5Zu+5qCHLzE2cHgvaG9tZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjk2Ljg3NTAwMCwgMi44NzUwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSLnvJbnu4QiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAtMC4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8bWFzayBpZD0ibWFzay11Z3ZqYXEzNng3LTIiIGZpbGw9IndoaXRlIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHVzZSB4bGluazpocmVmPSIjcGF0aC11Z3ZqYXEzNng3LTEiPjwvdXNlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvbWFzaz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLlvaLnirbnu5PlkIgiIGZpbGw9IiNGRkNDMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgeGxpbms6aHJlZj0iI3BhdGgtdWd2amFxMzZ4Ny0xIj48L3VzZT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg=="
+              height="16"
+              width="16"
+              x="65"
+              y="96"
+            ></image>
+          </g>
+        </svg>
+        <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" class="horizontal-obstacle-avoidance">
+          <g>
+            <path
+              d="M50 50 L85.35533905932738 14.644660940672622 A50 50 0 0 0 14.64466094067263 14.644660940672622 Z"
+              fill="rgba(255, 255, 255, 0.15)"
+            ></path>
+            <path
+              d="M50 50 L14.64466094067263 14.644660940672622 A50 50 0 0 0 14.644660940672622 85.35533905932738 Z"
+              fill="rgba(255, 255, 255, 0.15)"
+            ></path>
+            <path
+              d="M50 50 L14.644660940672622 85.35533905932738 A50 50 0 0 0 85.35533905932738 85.35533905932738 Z"
+              fill="rgba(255, 255, 255, 0.15)"
+            ></path>
+            <path
+              d="M50 50 L85.35533905932738 85.35533905932738 A50 50 0 0 0 85.35533905932738 14.64466094067263 Z"
+              fill="rgba(255, 255, 255, 0.15)"
+            ></path>
+          </g>
+          <g>
+            <path
+              d="M73.57022603955159 26.42977396044841 A33.333333333333336 33.333333333333336 0 0 0 26.429773960448415 26.42977396044841"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M26.429773960448415 26.42977396044841 A33.333333333333336 33.333333333333336 0 0 0 26.42977396044841 73.57022603955159"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M26.42977396044841 73.57022603955159 A33.333333333333336 33.333333333333336 0 0 0 73.57022603955159 73.57022603955159"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M73.57022603955159 73.57022603955159 A33.333333333333336 33.333333333333336 0 0 0 73.57022603955159 26.42977396044842"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M61.78511301977579 38.21488698022421 A16.666666666666668 16.666666666666668 0 0 0 38.21488698022421 38.21488698022421"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M38.21488698022421 38.21488698022421 A16.666666666666668 16.666666666666668 0 0 0 38.21488698022421 61.78511301977579"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M38.21488698022421 61.78511301977579 A16.666666666666668 16.666666666666668 0 0 0 61.78511301977579 61.78511301977579"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+            <path
+              d="M61.78511301977579 61.78511301977579 A16.666666666666668 16.666666666666668 0 0 0 61.78511301977579 38.21488698022421"
+              fill="transparent"
+              stroke-width="0.5"
+              stroke="rgba(255, 255, 255, 0.3)"
+            ></path>
+          </g>
+          <g></g>
+
+          <g transform="rotate(-9,50,50)"><path d="M50 50 L50 50" stroke-width="1" stroke="rgba(255, 255, 255, 1)"></path></g>
+          <g>
+            <image
+              xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDBweCIgaGVpZ2h0PSI0MHB4IiB2aWV3Qm94PSIwIDAgNDAgNDAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+MuWbvuaghy8zMnB4L2FpcmNyYWZ0L0w8L3RpdGxlPgogICAgPGcgaWQ9IjLlm77moIcvMzJweC9haXJjcmFmdC9MIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i57yW57uEIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4LjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgPHBhdGggZD0iTTEyLDAgTDI0LDI5IEwxMiwyNC40NTEyNzY0IEwwLDI5IEwxMiwwIFoiIGlkPSJUcmlhbmdsZS0xIiBmaWxsPSIjNUNBREZGIj48L3BhdGg+CiAgICAgICAgICAgIDxwb2x5Z29uIGlkPSJUcmlhbmdsZS0yIiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjEyIDAgMTYgMjYuMTQwNTg0NiAxMiAzMSI+PC9wb2x5Z29uPgogICAgICAgICAgICA8cG9seWdvbiBpZD0iVHJpYW5nbGUtMiIgZmlsbD0iIzAwNEI5OSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAuMDAwMDAwLCAxNS41MDAwMDApIHNjYWxlKC0xLCAxKSB0cmFuc2xhdGUoLTEwLjAwMDAwMCwgLTE1LjUwMDAwMCkgIiBwb2ludHM9IjggMCAxMiAyNi4xNDA1ODQ2IDggMzEiPjwvcG9seWdvbj4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=="
+              x="33"
+              y="34"
+              height="33"
+              width="33"
+            ></image>
+          </g>
+        </svg>
+        <svg width="16" height="73" xmlns="http://www.w3.org/2000/svg" class="vertical-obstacle-avoidance">
+          <g id="up">
+            <g id="up-background">
+              <rect x="4.5" y="0" width="7" height="36.5" fill="rgba(255, 255, 255, 0.2)" stroke-width="0.5" stroke="rgba(0, 0, 0, 0.6)"></rect>
+            </g>
+          </g>
+          <g id="down">
+            <g id="down-background">
+              <rect x="4.5" y="36.5" width="7" height="36.5" fill="rgba(255, 255, 255, 0.2)" stroke-width="0.5" stroke="rgba(0, 0, 0, 0.6)"></rect>
+            </g>
+          </g>
+          <g id="med">
+            <rect x="0.6" y="35.5" width="11" height="2" fill="rgba(255, 255, 255, 1)" stroke-width="0.2" stroke="rgba(0, 0, 0, 0.6)"></rect>
+          </g>
+          <g id="limit-block"></g>
+        </svg>
+        <svg width="3" height="50" xmlns="http://www.w3.org/2000/svg" class="vertical-velocity-vector">
+          <path d="M1.5 25 L1.5 25" stroke-width="8" stroke="rgba(255, 255, 255, 1)"></path>
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,161 @@
+:root {
+    --spacing-base: 1em;
+    --fa-navy: #183153;
+    --white: #ffffff;
+    --page-background: #f0f1f3;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: var(--page-background);
+}
+
+.wrapper {
+    padding: 0 1em;
+    height: 100vh;
+    overflow: auto;
+    position: relative;
+}
+
+.visual-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.icon-listing {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
+    grid-auto-rows: 7.5em;
+    grid-gap: var(--spacing-base) var(--spacing-base);
+    justify-items: center;
+    grid-auto-flow: row dense;
+    height: 100vh;
+
+    .icon-wrap {
+        width: 100%;
+        position: relative;
+
+        .icon-button {
+            width: 100%;
+            height: 100%;
+            font-family: inherit;
+            transition: all 100ms ease-in;
+            display: inline-block;
+            position: relative;
+            background: var(--white);
+            cursor: pointer;
+            user-select: none;
+            box-shadow: none;
+            border-color: currentColor;
+            padding: 1.5em 0.75em 1em 0.75em;
+            vertical-align: middle;
+            text-align: center;
+            text-decoration: none;
+            color: rgb(95, 105, 125);
+            font-weight: 400;
+            margin: 0;
+            border-width: 0;
+            border-style: solid;
+            border-radius: 0.5em;
+
+            &:hover {
+                background: #ffd43b;
+                text-decoration: none;
+                color: #183153;
+            }
+
+            &:active {
+                top: 0.375em;
+                border-width: 0;
+                box-shadow: none;
+                border-color: var(--fa-navy);
+                background: vvar(--fa-navy);
+                text-decoration: none;
+            }
+        }
+
+        .iconfont {
+            font-size: 2em;
+        }
+
+        .icon-label {
+            margin-top: 1.5em;
+            width: 100%;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            justify-content: center;
+            display: flex;
+        }
+
+        .icon-unicode {
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0;
+        }
+
+        &:hover {
+            .icon-unicode {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+@keyframes layer-bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.layer-anim-00 {
+    animation-name: layer-bounceIn;
+    animation-fill-mode: both;
+    animation-duration: 0.3s;
+}
+
+.dialog {
+    width: 520px;
+    height: 320px;
+}
+
+@keyframes layer-bounceOut {
+    100% {
+        opacity: 0;
+        -webkit-transform: scale(0.7);
+        -ms-transform: scale(0.7);
+        transform: scale(0.7);
+    }
+
+    30% {
+        -webkit-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+        transform: scale(1.05);
+    }
+
+    0% {
+        -webkit-transform: scale(1);
+        -ms-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+.layer-anim-close {
+    animation-name: layer-bounceOut;
+    animation-fill-mode: both;
+    animation-duration: 0.2s;
+}
