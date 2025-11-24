@@ -3,12 +3,16 @@ const path = require('path');
 const fs = require('fs');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const axios = require('axios');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
 const stylesHandler = MiniCssExtractPlugin.loader;
 
+/**
+ * 读取指定目录下的 EJS 文件信息
+ */
 function readFilesInfo(directory) {
   const ejsFilesInfo = [];
 
@@ -25,44 +29,67 @@ function readFilesInfo(directory) {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const titleMatch = fileContent.match(/<title>(.*?)<\/title>/);
         const title = titleMatch ? titleMatch[1] : '未定义标题';
+        const name = path.basename(file, '.ejs');
         ejsFilesInfo.push({
           path: filePath,
           title: title,
+          name: name,
         });
       }
     });
   }
 
   readDirectory(directory);
-
   return ejsFilesInfo;
 }
+
+/**
+ * 自动生成 entry 配置
+ */
+function generateEntries() {
+  const srcDir = path.join(__dirname, 'src');
+  const entries = {};
+  
+  const files = fs.readdirSync(srcDir);
+  files.forEach((file) => {
+    const filePath = path.join(srcDir, file);
+    const fileStats = fs.statSync(filePath);
+    
+    if (fileStats.isFile() && path.extname(file) === '.js') {
+      const name = path.basename(file, '.js');
+      entries[name] = `./src/${file}`;
+    }
+  });
+  
+  return entries;
+}
+
 const targetDirectory = path.join(__dirname, 'public');
-const files = readFilesInfo(targetDirectory);
+const ejsFiles = readFilesInfo(targetDirectory);
+
 const config = {
-  entry: {
-    index: './src/index.js',
-    fontawesome: './src/fontawesome.js',
-    compass: './src/compass.js',
-    dialog: './src/dialog.js',
-    'seamless-scroll': './src/seamless-scroll.js',
-    'demo': './src/demo.js',
-    'home-pod': './src/home-pod.js',
-  },
+  entry: generateEntries(),
+  
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].[contenthash:8].js',
     path: path.resolve(__dirname, 'dist'),
+    clean: true, // Webpack 5+ 自带清理功能
   },
+  
+  devtool: isProduction ? 'source-map' : 'eval-source-map',
+  
   devServer: {
     open: true,
     port: 8080,
     host: 'localhost',
+    hot: true,
     setupMiddlewares: (middlewares, devServer) => {
       if (!devServer) {
         throw new Error('webpack-dev-server is not defined');
       }
 
-      devServer.app.get('/apis/fontawesome-v6/queries', async (_, response) => {
+      // FontAwesome API 代理
+      devServer.app.get('/apis/fontawesome-v6/queries', async (req, response) => {
         try {
           const res = await axios.post(
             `https://m19dxw5x0q-dsn.algolia.net/1/indexes/*/queries?x-algolia-agent=Algolia%20for%20JavaScript%20(4.20.0)%3B%20Browser%20(lite)%3B%20instantsearch.js%20(4.60.0)%3B%20Vue%20(2.7.15)%3B%20Vue%20InstantSearch%20(4.12.1)%3B%20JS%20Helper%20(3.15.0)&x-algolia-api-key=c79b2e61519372a99fa5890db070064c&x-algolia-application-id=M19DXW5X0Q`,
@@ -82,61 +109,58 @@ const config = {
               },
             },
           );
-          console.log(res.statusText);
-          response.send(res.data);
+          console.log('FontAwesome API:', res.statusText);
+          response.json(res.data);
         } catch (error) {
-          response.send(error);
+          console.error('FontAwesome API Error:', error.message);
+          response.status(500).json({
+            error: 'Failed to fetch FontAwesome data',
+            message: error.message,
+          });
         }
       });
+      
       return middlewares;
     },
   },
+  
   plugins: [
-    new MiniCssExtractPlugin(),
-
-    new HtmlWebpackPlugin({
-      template: './public/fontawesome.ejs',
-      filename: 'fontawesome.html',
-      chunks: ['fontawesome'],
+    // 清理输出目录（如果你想用插件而不是 output.clean）
+    // new CleanWebpackPlugin(),
+    
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
     }),
 
-    new HtmlWebpackPlugin({
-      template: './public/seamless-scroll.ejs',
-      filename: 'seamless-scroll.html',
-      chunks: ['seamless-scroll'],
-    }),
-    new HtmlWebpackPlugin({
-      template: './public/compass.ejs',
-      filename: 'compass.html',
-      chunks: ['compass'],
-    }),
-    new HtmlWebpackPlugin({
-      template: './public/dialog.ejs',
-      filename: 'dialog.html',
-      chunks: ['dialog'],
-    }),
-    new HtmlWebpackPlugin({
-      template: './public/demo.ejs',
-      filename: 'demo.html',
-      chunks: ['demo'],
-    }),
-     new HtmlWebpackPlugin({
-      template: './public/home-pod.ejs',
-      filename: 'home-pod.html',
-      chunks: ['home-pod'],
-    }),
+    // 自动生成所有页面的 HtmlWebpackPlugin（除了 index.html）
+    ...ejsFiles
+      .filter((file) => file.name !== 'index')
+      .map((file) => {
+        return new HtmlWebpackPlugin({
+          template: file.path,
+          filename: `${file.name}.html`,
+          chunks: [file.name],
+          minify: isProduction ? {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+          } : false,
+        });
+      }),
+
+    // index.html 单独处理，因为它有特殊的 templateParameters
     new HtmlWebpackPlugin({
       templateParameters: {
         getPages: function () {
-          const { host = 'localhost', port = '8080' } = this.webpackConfig.devServer;
+          const { host = 'localhost', port = 8080 } = this.webpackConfig.devServer;
           const url = `http://${host}:${port}`;
-          return files
+          return ejsFiles
             .filter((item) => item.title !== 'index')
             .map((item) => {
               return {
                 ...item,
-                key: item.path.split('public/')[1].replace('.ejs', ''),
-                path: url + item.path.split('public')[1].replace('.ejs', '.html'),
+                key: item.name,
+                path: `${url}/${item.name}.html`,
               };
             });
         },
@@ -144,15 +168,20 @@ const config = {
       template: './public/index.ejs',
       filename: 'index.html',
       chunks: ['index'],
+      minify: isProduction ? {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+      } : false,
     }),
-    // Add your plugins here
-    // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],
+  
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/i,
         loader: 'babel-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.styl$/i,
@@ -165,11 +194,37 @@ const config = {
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
         type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8 * 1024, // 8kb 以下的文件转为 base64
+          },
+        },
       },
-
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
     ],
+  },
+  
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          priority: 10,
+        },
+        common: {
+          minChunks: 2,
+          priority: 5,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+  
+  performance: {
+    hints: isProduction ? 'warning' : false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
   },
 };
 
