@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Canvas HomePod Texture (Corrected)</title>
+    <title>HomePod</title>
     <style>
         body {
             margin: 0;
@@ -19,75 +19,36 @@
     </style>
 </head>
 <body>
+    <div class="homepod-wrapper" style="display: no-ne;">
+        <div class="gradient-background overlay"></div>
+        <img class="homepod-img" src="static/images/homepod.png" alt="" />
+        <div class="homepod-player">
+          <div class="gradient-background main">
+            <img class="homepod-owner" src="https://assets.codepen.io/3364143/Character%3DMary%2C+Skin+tone%3DWhite%2C+Posture%3D1+Happy.png" alt="" />
+            <div class="singer-wrapper">
+              <button class="button prev">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
+                </svg>
+              </button>
+              <div class="singer-area">
+                <img src="https://i.scdn.co/image/ab67616d0000b273a91c10fe9472d9bd89802e5a" alt="" class="singer" />
+              </div>
+              <button class="button next">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z" />
+              </button>
+              </svg>
+            </div>
+            <div class="song-info">
+              <h3 class="song-title">Enough for you</h3>
+              <p class="artist-name">Olivia Rodrigo</p>
+            </div>
+          </div>
+        </div>
+      </div>
     <canvas id="texture-canvas"></canvas>
 
-    <script>
-        const canvas = document.getElementById('texture-canvas');
-        const ctx = canvas.getContext('2d');
-
-        // --- 参数配置 (对应您的 CSS-Doodle) ---
-        const CONFIG = {
-            count: 75,             // @m75: 圆环数量
-            circleColor: '#f2f0fccc', // --circle-color: 圆环颜色
-            lineWidth: 1.5,        // 模拟 gradient 边缘的厚度
-            scale: 0.4             // 整体缩放比例，用于适配屏幕
-        };
-
-        function draw() {
-            // 1. 设置画布尺寸
-            const W = window.innerWidth;
-            const H = window.innerHeight;
-            canvas.width = W;
-            canvas.height = H;
-
-            // 2. 确定尺寸逻辑
-            // 在 doodle 中，容器是 300px，圆是 150px。
-            // 也就是说：绘制的圆环直径是容器直径的一半 (0.5)。
-            // 绘制的位置 @plot(r:1) 是在容器边缘。
-            
-            // 为了在全屏 Canvas 上复刻，我们定义一个基准尺寸
-            // 取屏幕较短边的一半作为基准半径 "R"
-            const baseSize = Math.min(W, H) * CONFIG.scale; 
-            const orbitRadius = baseSize / 2; // 轨道半径 (圆心分布的位置)
-            const ringRadius = orbitRadius * 0.5; // 圆环半径 (doodle中是容器的一半)
-
-            const centerX = W / 2;
-            const centerY = H / 2;
-
-            // 3. 绘制背景 (模拟 radial-gradient 背景)
-            const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, orbitRadius);
-            bgGradient.addColorStop(0, 'transparent');
-            bgGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)'); // 模拟 white 50%
-            bgGradient.addColorStop(1, 'transparent');
-            // ctx.fillStyle = bgGradient; // 暂时注释，如果需要背景光晕可开启
-            // ctx.fillRect(0, 0, W, H);
-
-            // 4. 绘制干涉纹理
-            ctx.strokeStyle = CONFIG.circleColor;
-            ctx.lineWidth = CONFIG.lineWidth;
-            
-            // 关键逻辑：循环 N 次，沿圆周分布圆环
-            for (let i = 0; i < CONFIG.count; i++) {
-                // 计算当前圆环的圆心位置
-                // 角度从 0 到 2PI 均匀分布
-                const angle = (i / CONFIG.count) * (Math.PI * 2);
-
-                // 极坐标转换：计算圆心 (x, y)
-                // 对应 @plot(r: 1) -> 这里的 r 就是 orbitRadius
-                const x = centerX + Math.cos(angle) * orbitRadius;
-                const y = centerY + Math.sin(angle) * orbitRadius;
-
-                // 绘制圆环
-                ctx.beginPath();
-                ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-        }
-
-        // 初始化并监听窗口调整
-        draw();
-        window.addEventListener('resize', draw);
-
-    </script>
+  
 </body>
 </html>

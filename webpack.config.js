@@ -83,6 +83,11 @@ const config = {
     port: 8080,
     host: 'localhost',
     hot: true,
+    static: {
+      directory: path.join(__dirname, 'static'),
+      publicPath: '/static',
+      watch: true, // 监听静态文件变化
+    },
     setupMiddlewares: (middlewares, devServer) => {
       if (!devServer) {
         throw new Error('webpack-dev-server is not defined');
